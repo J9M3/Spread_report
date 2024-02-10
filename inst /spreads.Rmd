@@ -1,0 +1,40 @@
+---
+title: "SugarV.Slop_analysis"
+author: "J9M3"
+date: "2024-02-08"
+output: html_document
+---
+## Prices Involved 
+
+
+
+```{r tickers  , echo=F}
+print(tickers)
+print(start_date)
+```
+
+
+## Normalised Plots 
+```{r norm.plots , echo=F }
+plot.list
+```
+
+
+## Cor. Plots 
+
+```{r cor.plots , echo=F}
+ corrplot(cor.matrix ,
+                     type = "lower" ,
+                     method = "number") 
+
+```
+
+## Potential Spreads 
+
+spreads are generated with a rolling mean of 22
+
+```{r spreads.22.plots  ,fig.keep='all', echo=F}
+
+spreads.r22.plot
+
+```
