@@ -123,5 +123,5 @@ plot.list <- lapply(tickers ,
 
 ## Render HTML -----
 
-rmarkdown::render( input = "slop_analysis.Rmd")
+rmarkdown::render( input = "Markdown_files/spreads.Rmd")
 
