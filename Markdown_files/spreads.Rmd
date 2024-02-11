@@ -13,6 +13,7 @@ output:
 ```{r tickers  , echo=F}
 print(tickers)
 print(start_date)
+print(rolling_window)
 ```
 
 
@@ -24,7 +25,7 @@ plot.list
 
 ## Correlation Plots 
 
-```{r cor.plots , echo=F, results='hide'}
+```{r cor.plots , echo=F, results='hide' , fig.height = 25, fig.width = 25}
  corrplot(cor.matrix ,
           type = "lower" ,
           method = "number", 
@@ -35,7 +36,7 @@ plot.list
 
 ## Potential Spreads 
 
-spreads are generated with a rolling mean of 22
+spreads are generated with a rolling mean
 
 ```{r spreads.22.plots  ,fig.keep='all', echo=F , results='hide'}
 
