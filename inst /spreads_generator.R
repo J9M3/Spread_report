@@ -14,9 +14,9 @@ pacman::p_load(magrittr ,
 
 corrfilt <- T
 corrfilt.metric <- 0.9
-rolling_window <- 1
-tickers <- c("KO" , "SB=F" , "PEP" , "NSRGY" , "UNH")
-start_date <- "2016-01-01"
+rolling_window <- 5
+#tickers <- c("KO" , "SB=F" , "PEP" , "NSRGY" , "UNH")
+start_date <- "2023-06-01"
 
 
 ## Load data via quantmod ----
@@ -143,6 +143,7 @@ spreads.plot <- lapply(new_feats.rolling, function(tick){
     ggtitle(paste(p.title))
 })
 
+names(spreads.plot) <- new_feats.rolling
 
 ## Price Plots ----
 plot.list <- list()
@@ -157,7 +158,7 @@ plot.list <- lapply(tickers ,
                         ggtitle(paste(tick))
                       
                     })
-
+names(plot.list) <- tickers
 
 ## Render HTML -----
 

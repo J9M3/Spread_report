@@ -20,4 +20,4 @@ paragraphs <- html_elements(html.sourse, "div.company-code")
 tickers <- html_text(paragraphs)
 
 
-tickers <- tickers[1:5]
+tickers <- tickers[1:20]
