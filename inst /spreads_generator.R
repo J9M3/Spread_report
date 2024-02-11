@@ -9,10 +9,17 @@ pacman::p_load(magrittr ,
                DescTools ,
                purrr , 
                corrplot)
-## Load data via quantmod ----
 
+## Data settings ----
+
+corrfilt <- T
+corrfilt.metric <- 0.9
+rolling_window <- 1
 tickers <- c("KO" , "SB=F" , "PEP" , "NSRGY" , "UNH")
 start_date <- "2016-01-01"
+
+
+## Load data via quantmod ----
 
 quantmod::getSymbols(tickers , from = start_date) %>%
   as.data.table()
@@ -42,20 +49,44 @@ tickers <- new_tickers
 rm(new_tickers)
 ## Normalize ----
 
-dt[ , (tickers) :=
+tickers.norm <- paste0(tickers, ".norm")
+
+dt[ , (tickers.norm) :=
       lapply(.SD , function(x){ ( x - mean(x)) / sd(x)}) 
     , .SDcols = tickers]
 
 ## Correlation Matrix ----
 cor.matrix <- cor(dt[ , .SD , .SDcols = tickers]) 
+# Filtering
 
+if(corrfilt == T){
+  
+cor.matrix.filter <- which(abs(cor.matrix) > corrfilt.metric
+                           , arr.ind = T)
+cor.matrix.filter <- data.table(
+  r1 = rownames(cor.matrix)[cor.matrix.filter[,1]] %>% paste0(. , ".norm"), 
+  r2 = rownames(cor.matrix)[cor.matrix.filter[,2]] %>% paste0(. , ".norm")                          
+)
+
+
+cor.matrix.filter <- paste0(cor.matrix.filter$r1,
+                            "sprd" ,
+                            cor.matrix.filter$r2
+                            )
+
+}
 ## Spreads Generation ----
 
-new_feats <- outer(tickers , tickers, FUN=paste)
+new_feats <- outer(tickers.norm , tickers.norm, FUN=paste)
 new_feats <- new_feats[lower.tri(new_feats , diag = F)] %>% 
                         stringr::str_replace(. , " " , "sprd")
 
 
+if(corrfilt == T){
+
+  new_feats <- cor.matrix.filter[cor.matrix.filter %in% new_feats]
+   
+}
 
 spreads.list <- map(new_feats , function(x){
             feats2split <- 
@@ -79,18 +110,25 @@ rm(spreads.list)
 dt <- cbind(dt , spreads.dt)
 
 
-new_feats.r22 <- paste0(new_feats , ".r22")
+new_feats.rolling <- paste0(new_feats , ".r" ,  rolling_window)
 
 
-dt[ , (new_feats.r22) := frollmean(.SD ,  22) 
+dt[ , (new_feats.rolling) := frollmean(.SD ,  rolling_window) 
     , .SDcols = new_feats]
 
 dt <- dt %>% na.omit()
 
-spreads.r22.plot <- list()
+spreads.plot <- list()
 
 
-spreads.r22.plot <- lapply(new_feats.r22, function(tick){
+spreads.plot <- lapply(new_feats.rolling, function(tick){
+  
+  # Augmenting Title 
+  p.title <- tick %>% 
+    stringr::str_remove_all(. , ".norm" ) %>% 
+    stringr::str_replace(. , "sprd" , " - ")
+  
+  # Generating Plot
   ggplot(data = dt , 
          aes(x = Date,
              y = dt[[tick]])
@@ -101,8 +139,8 @@ spreads.r22.plot <- lapply(new_feats.r22, function(tick){
               alpha = 0.8 ,
               linetype = "dashed"
               ) +
-    ylab(paste0(tick)) + 
-    ggtitle(paste(tick))
+    ylab(paste0(p.title)) + 
+    ggtitle(paste(p.title))
 })
 
 
@@ -123,5 +161,7 @@ plot.list <- lapply(tickers ,
 
 ## Render HTML -----
 
-rmarkdown::render( input = "Markdown_files/spreads.Rmd")
-
+rmarkdown::render(input = "Markdown_files/spreads.Rmd", 
+                  output_file = "Spreads_assessment",
+                  output_dir = "/Users/j9m3/Documents/Code/R/Output_HTMLs"
+                  )

@@ -1,8 +1,10 @@
 ---
-title: "SugarV.Slop_analysis"
-author: "J9M3"
-date: "2024-02-08"
-output: html_document
+title: "Spreads Analysis"
+output: 
+  html_document:
+    toc : true
+    toc_float:
+      toc_collapsed: true
 ---
 ## Prices Involved 
 
@@ -15,17 +17,19 @@ print(start_date)
 
 
 ## Normalised Plots 
-```{r norm.plots , echo=F }
+```{r norm.plots , echo=F  , results='hide'}
 plot.list
 ```
 
 
-## Cor. Plots 
+## Correlation Plots 
 
-```{r cor.plots , echo=F}
+```{r cor.plots , echo=F, results='hide'}
  corrplot(cor.matrix ,
-                     type = "lower" ,
-                     method = "number") 
+          type = "lower" ,
+          method = "number", 
+          diag = F
+          ) 
 
 ```
 
@@ -33,8 +37,8 @@ plot.list
 
 spreads are generated with a rolling mean of 22
 
-```{r spreads.22.plots  ,fig.keep='all', echo=F}
+```{r spreads.22.plots  ,fig.keep='all', echo=F , results='hide'}
 
-spreads.r22.plot
+spreads.plot
 
 ```
